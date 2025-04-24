@@ -38,6 +38,8 @@ def bat_calc():
 
     #retrieve the current power usage
     verbruik = float(sensor.p1_meter_5c2faf051580_active_power)
+    corr_verbruik = float(input_number.batpower_correction)
+    verbruik = verbruik - corr_verbruik
 
     #and retrieve also the power usage per phase. Respect the order of the batteries that are assigned
     #to the different phases. In the example below, the first battery is coupled to the first phase, the third 
