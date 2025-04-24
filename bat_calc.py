@@ -13,7 +13,7 @@ def bat_calc():
     #are stored in a temporary string variabel (batcalctemp), because it takes a longer period to
     #read the current power settings from the batteries. This allows faster iterations.
 
-    #This procedure works in 4 steps. In the first step, the delta power usage will be 
+    #This procedure works in 4 steps. In the first step, the delta power usage will be
     #distributed over the batteries that are already in use. In case of substracting the difference
     #the battery with the lowest power setting will be used first. In case of adding differences, 
     #the battery with the highest power usage will be used first.
