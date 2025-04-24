@@ -1,0 +1,39 @@
+alias: Master steering batteries
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - script.steering_batteries
+    from: "on"
+    to: "off"
+    id: Zet aan
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+  - trigger: time_pattern
+    id: Check
+    enabled: true
+    minutes: /5
+conditions: []
+actions:
+  - if:
+      - condition: trigger
+        id:
+          - Zet aan
+    then:
+      - action: script.steering_batteries
+        metadata: {}
+        data: {}
+  - if:
+      - condition: trigger
+        id:
+          - Check
+      - condition: state
+        entity_id: script.steering_batteries
+        state: "off"
+    then:
+      - action: script.steering_batteries
+        metadata: {}
+        data: {}
+mode: single
