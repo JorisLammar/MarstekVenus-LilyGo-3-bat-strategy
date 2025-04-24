@@ -1,0 +1,204 @@
+sequence:
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: ssss000000000000
+    target:
+      entity_id: input_text.batcalctemp
+  - action: select.select_option
+    metadata: {}
+    data:
+      option: stop
+    target:
+      entity_id:
+        - select.lilygo_bat1_marstek_forcible_charge_discharge
+        - select.lilygo_bat2_marstek_forcible_charge_discharge
+        - select.lilygo_bat3_marstek_forcible_charge_discharge
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 8
+      milliseconds: 0
+  - repeat:
+      count: 24000
+      sequence:
+        - action: homeassistant.update_entity
+          metadata: {}
+          data:
+            entity_id:
+              - sensor.p1_meter_5c2faf051580_active_power
+              - sensor.p1_meter_5c2faf051580_active_power_l1
+              - sensor.p1_meter_5c2faf051580_active_power_l2
+              - sensor.p1_meter_5c2faf051580_active_power_l3
+        - action: pyscript.bat_calc
+          data: {}
+        - variables:
+            output: "{{ states('input_text.batcalctemp') }}"
+            new_state: |-
+              {% if output[0:1] == "c" %}
+                charge
+              {% elif output[0:1] == "d" %}
+                discharge
+              {% else %}
+                stop
+              {% endif %}
+            new_state1: |-
+              {% if output[1:2] == "c" %}
+                charge
+              {% elif output[1:2] == "d" %}
+                discharge
+              {% else %}
+                stop
+              {% endif %}
+            new_state2: |-
+              {% if output[2:3] == "c" %}
+                charge
+              {% elif output[2:3] == "d" %}
+                discharge
+              {% else %}
+                stop
+              {% endif %} 
+            new_state3: |-
+              {% if output[3:4] == "c" %}
+                charge
+              {% elif output[3:4] == "d" %}
+                discharge
+              {% else %}
+                stop
+              {% endif %} 
+            new_power1: "{{ output [4:8] | int }}"
+            new_power2: "{{ output [8:12] | int }}"
+            new_power3: "{{ output [12:16] | int }}"
+            switch: >-
+              {{
+              ((states('select.lilygo_bat1_marstek_forcible_charge_discharge')
+              != new_state1) and (new_state1 != "stop")) or 
+              ((states('select.lilygo_bat2_marstek_forcible_charge_discharge')
+              != new_state2) and (new_state2 != "stop")) or
+              ((states('select.lilygo_bat3_marstek_forcible_charge_discharge')
+              != new_state3) and (new_state3 != "stop"))}}
+        - if:
+            - condition: template
+              value_template: "{{ new_state1 == \"charge\" }}"
+          then:
+            - action: number.set_value
+              metadata: {}
+              data:
+                value: "{{ new_power1 }}"
+              target:
+                entity_id: number.lilygo_bat1_marstek_forcible_charge_power
+          alias: Charge bat1
+        - if:
+            - condition: template
+              value_template: "{{ new_state2 == \"charge\" }}"
+          then:
+            - action: number.set_value
+              metadata: {}
+              data:
+                value: "{{ new_power2 }}"
+              target:
+                entity_id: number.lilygo_bat2_marstek_forcible_charge_power
+          alias: Charge bat2
+        - if:
+            - condition: template
+              value_template: "{{ new_state3 == \"charge\" }}"
+          then:
+            - action: number.set_value
+              metadata: {}
+              data:
+                value: "{{ new_power3 }}"
+              target:
+                entity_id: number.lilygo_bat3_marstek_forcible_charge_power
+          alias: Charge bat3
+        - alias: Discharge bat1
+          if:
+            - condition: template
+              value_template: "{{ new_state1 == \"discharge\" }}"
+          then:
+            - action: number.set_value
+              metadata: {}
+              data:
+                value: "{{ new_power1 }}"
+              target:
+                entity_id: number.lilygo_bat1_marstek_forcible_discharge_power
+        - alias: Discharge bat2
+          if:
+            - condition: template
+              value_template: "{{ new_state2 == \"discharge\" }}"
+          then:
+            - action: number.set_value
+              metadata: {}
+              data:
+                value: "{{ new_power2 }}"
+              target:
+                entity_id: number.lilygo_bat2_marstek_forcible_discharge_power
+        - alias: Discharge bat3
+          if:
+            - condition: template
+              value_template: "{{ new_state3 == \"discharge\" }}"
+          then:
+            - action: number.set_value
+              metadata: {}
+              data:
+                value: "{{ new_power3 }}"
+              target:
+                entity_id: number.lilygo_bat3_marstek_forcible_discharge_power
+        - alias: Change state bat1
+          if:
+            - condition: template
+              value_template: >-
+                {{
+                states('select.lilygo_bat1_marstek_forcible_charge_discharge')
+                != new_state1 }}
+          then:
+            - action: select.select_option
+              metadata: {}
+              data:
+                option: "{{ new_state1 }}"
+              target:
+                entity_id: select.lilygo_bat1_marstek_forcible_charge_discharge
+        - alias: Change state bat2
+          if:
+            - condition: template
+              value_template: >-
+                {{
+                states('select.lilygo_bat2_marstek_forcible_charge_discharge')
+                != new_state2 }}
+          then:
+            - action: select.select_option
+              metadata: {}
+              data:
+                option: "{{ new_state2 }}"
+              target:
+                entity_id: select.lilygo_bat2_marstek_forcible_charge_discharge
+        - alias: Change state bat3
+          if:
+            - condition: template
+              value_template: >-
+                {{
+                states('select.lilygo_bat3_marstek_forcible_charge_discharge')
+                != new_state3 }}
+          then:
+            - action: select.select_option
+              metadata: {}
+              data:
+                option: "{{ new_state3 }}"
+              target:
+                entity_id: select.lilygo_bat3_marstek_forcible_charge_discharge
+        - if:
+            - condition: template
+              value_template: "{{ switch }}"
+          then:
+            - delay:
+                hours: 0
+                minutes: 0
+                seconds: 12
+                milliseconds: 0
+          else:
+            - delay:
+                hours: 0
+                minutes: 0
+                seconds: 6
+                milliseconds: 500
+alias: Steering batteries
+description: ""
