@@ -11,21 +11,28 @@ The calculation of the power settings is running in a pyscript (python)
 If you don't have installed pyscript, look for pyscript in the add-on store and install the add-on. Scripts are stored in a subfolder config/pyscript. With the Studio Code Server, it is easy to handle the code.
 
 Steps:
-1. Make a helper (input_text) called batcalctemp
-2. Copy the python script bat_calc in the config/pyscript folder.
-3. Change the code (between line 40 en 72) to adapt to your entities
+1. Make a helper (input_text) called batcalctemp. In this variable, the data between two iterations will be stored and the output
+   is used in the script to change the settings of the batteries.
+2. Make a helper (input_number) called batpower_correction (range -8000, +8000), set to 0. This variable can be used to change the
+   charging behavior. It will be substracted from the current power usage to calculate the power settings for the battery. E.g. on a
+   rainy day, you want to be sure to have enough power in the batteries. You can change the batpower_correction to your month peak, so
+   the batteries will charge extra but not exceed your month peak. You need to make your own automation to manipulate this variabel (or
+   handle it manually). It could also be used to handle dynamic tariffs.
+3. Copy the python script bat_calc in the config/pyscript folder.
+4. Change the code (between line 40 en 72) to adapt to your entities
 	a. Power usage
 	b. Power usage per phase (in the same order as how the batteries are assigned to the phases).
 	e.g. if battery1 is assigned to phase1, battery2 is assigned to phase 3 en battery3 is assigned to phase2. fase[0] is according to l1, fase[1] to l3 and fase[2] to l2.
 	c. Battery_state_of_charge, charging_cutoff_capacity, discharging_cutoff_capacity, max_charge_power and max_discharge_power of each battery
-4. Copy the 'steering battery' YAML script in a new script and give it a proper name (you need that name later in adapting the master automation that is guarding the script.
-5. Change also the YAML code of the script to adapt to your entities
+5. Copy the 'steering battery' YAML script in a new script and give it a proper name (you need that name later in adapting the master automation that is guarding the script.
+6. Change also the YAML code of the script to adapt to your entities
 	a. Second step before the loop: stop all batteries
 	b. First action of the loop, refresh the power usage of your p1 meter
 	c. Third action, the last variabel 'switch' needs to be adjusted with the correct entity names of the forcible_charge_discharge settings of each battery
-	d. Same for the next statements: setting the charging or discharging power and forcible_charge_discharge settings for each battery. The forcible_charge_discharge setting will be changed only if it is really changed. This will save time on the RS232 interface.
+	d. Same for the next statements: setting the charging or discharging power and forcible_charge_discharge settings for each battery. 
+	   The forcible_charge_discharge setting will be changed only if it is really changed. This will save time on the RS232 interface.
 	e. Start running the script. The script runs 24000 iterations, which is about 43 hours.
-6. Copy the 'master steering battery' YAML code to a new automation. Change the name of the script in the code according to the name you gave in step 4.
+7. Copy the 'master steering battery' YAML code to a new automation. Change the name of the script in the code according to the name you gave in step 4.
 
 Remarks:
 1. If one or more batteries changes to another active state (charge or discharge), the script will wait 12 seconds. The batteries needs the time to reach the new power settings. Otherwise the settings will overshoot and after 3 or 4 iterations get stable.
