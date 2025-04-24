@@ -27,11 +27,12 @@ Steps:
 	e. Start running the script. The script runs 24000 iterations, which is about 43 hours.
 6. Copy the 'master steering battery' YAML code to a new automation. Change the name of the script in the code according to the name you gave in step 4.
 
-Remarks;
-	• If one or more batteries changes to another active state (charge or discharge), the script will wait 12 seconds. The batteries needs the time to reach the new power settings. Otherwise the settings will overshoot and after 3 or 4 iterations get stable.
+Remarks:
+1. If one or more batteries changes to another active state (charge or discharge), the script will wait 12 seconds. The batteries needs the time to reach the new power settings. Otherwise the settings will overshoot and after 3 or 4 iterations get stable.
 Eg. Power consumption is -1000W, which means there is a potential of 1000W charging. After 6 seconds, the power consumption will be -400W, which will be added to the already 1000W charging power, resulting in 400W power consumption 6 seconds later. The 400W will be subtracted again in the next iteration.
-	• The 6,5 seconds wait between the iterations is based on some test periods. Faster iterations can result in overshooting behavior. But you can try to test with faster iterations. 
-	• The discharging_cutoff_capacity is 12% and can't be set lower. This will result in a cutoff during discharge at 0,61 kWh in stead of 0,56 kWh. The advantage is that the battery will not consume 5W when total empty. If you want the battery to be discharged to 0,56kWh, you can change the cutoff capacity hard-coded to 11%.
-	• Suggestions for improvements are always welcome.
+2. The 6,5 seconds wait between the iterations is based on some test periods. Faster iterations can result in overshooting behavior. But you can try to test with faster iterations. 
+3. The discharging_cutoff_capacity is 12% and can't be set lower. This will result in a cutoff during discharge at 0,61 kWh in stead of 0,56 kWh. The advantage is that the battery will not consume 5W when total empty. If you want the battery to be discharged to 0,56kWh, you can change the cutoff capacity hard-coded to 11%.
+4. You can tweak by changing the cutoff capacity and max_power settings of each battery individual. The python code should take these values into account.
+5. Suggestions for improvements are always welcome.
 
 
