@@ -241,7 +241,7 @@ def bat_calc():
         for j in range(3):
             if dir_state * bat_pct[j] < high_pct and dir_state * bat_pct[j] < max_bat[j] and power[j] == 0:
                 high = j
-                high_pct = bat_pct[j]
+                high_pct = dir_state * bat_pct[j]
 
         #if there is candidate battery to take some delta, check whether the maximum power setting is not exceeded.        
         if high >= 0:
